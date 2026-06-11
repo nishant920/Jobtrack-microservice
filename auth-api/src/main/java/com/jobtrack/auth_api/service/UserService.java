@@ -2,13 +2,16 @@ package com.jobtrack.auth_api.service;
 
 import com.jobtrack.auth_api.dto.AppUserDto;
 import com.jobtrack.auth_api.dto.UserResponseDto;
+import com.jobtrack.auth_api.exception.InvalidCredentials;
 import com.jobtrack.auth_api.model.AppUser;
 import com.jobtrack.auth_api.repository.UserRepository;
 import com.jobtrack.auth_api.repository.VerificationRepository;
+import com.jobtrack.auth_api.utility.JwtUtility;
 import com.jobtrack.auth_api.utility.Mapper;
 import com.jobtrack.auth_api.verfication.VerificationToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,6 +25,11 @@ public class UserService {
     UserRepository userRepository;
     @Autowired
     VerificationRepository verificationRepository;
+    @Autowired
+    JwtUtility jwtUtility;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     public UserResponseDto saveUser(AppUserDto appUserDto){
         AppUser existingUser = userRepository.findByEmail(appUserDto.getEmail());
@@ -30,8 +38,11 @@ public class UserService {
         }
         AppUser appUser = mapper.mapAppUserDtoToAppUser(appUserDto);
         appUser.setVerified(false);
+
+        appUser.setPassword(passwordEncoder.encode(appUserDto.getPassword())); //encoding the password for
+
         AppUser savedUser = userRepository.save(appUser);
-        UserResponseDto userResponceDto = mapper.mapAppUserToResponceDto(savedUser);
+        UserResponseDto userResponseDto = mapper.mapAppUserToResponseDto(savedUser);
 
         //Verification token generated here
         String token = UUID.randomUUID().toString();
@@ -43,7 +54,7 @@ public class UserService {
         verificationRepository.save(verificationToken);
 
         log.info("calling notification-api to send verification mail with token : " + token);
-        return userResponceDto;
+        return userResponseDto;
     }
 
     public String verifyToken(String token){
@@ -54,11 +65,32 @@ public class UserService {
             throw new RuntimeException("Verification token is Expired");
         }
 
-        AppUser appUser = new AppUser();
+        AppUser appUser = verificationToken.getUser();
         appUser.setVerified(true);
+
         userRepository.save(appUser);
         verificationRepository.delete(verificationToken);
         return "Email is Verified successfully";
+    }
+
+    public AppUser findUserByEmail(String email){
+        return userRepository.findByEmail(email);
+    }
+
+    public String isValidCredentials(String email, String password){
+        AppUser user = findUserByEmail(email);
+        if(user == null){
+            throw new InvalidCredentials("Invalid credentials");
+        }
+        if(!user.isVerified()){
+            throw new RuntimeException("Please verify your email first");
+        }
+        if(!passwordEncoder.matches(password, user.getPassword())){
+            throw new InvalidCredentials("Invalid credentials");
+        }
+
+        return jwtUtility.generateToken(email, "User");
+
     }
 
 }

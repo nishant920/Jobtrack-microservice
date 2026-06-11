@@ -1,6 +1,7 @@
 package com.jobtrack.auth_api.controller;
 
 import com.jobtrack.auth_api.dto.AppUserDto;
+import com.jobtrack.auth_api.dto.LoginDto;
 import com.jobtrack.auth_api.dto.UserResponseDto;
 import com.jobtrack.auth_api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,5 +31,11 @@ public class UserController {
         }catch (RuntimeException exception){
             return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PostMapping("login")
+    public ResponseEntity<?> loginUser(@RequestBody LoginDto loginDTO){
+        String token = userService.isValidCredentials(loginDTO.getEmail(), loginDTO.getPassword());
+        return new ResponseEntity<>(token, HttpStatus.OK);
     }
 }

@@ -11,15 +11,14 @@ public class Mapper {
           AppUser appUser = new AppUser();
           appUser.setName(appUserDto.getName());
           appUser.setEmail(appUserDto.getEmail());
-          appUser.setPassword(appUserDto.getPassword());
           return appUser;
     }
 
-    public UserResponseDto mapAppUserToResponceDto(AppUser appUser){
+    public UserResponseDto mapAppUserToResponseDto(AppUser appUser){
         UserResponseDto userResponseDto = new UserResponseDto();
         userResponseDto.setName(appUser.getName());
         userResponseDto.setEmail(appUser.getEmail());
-        userResponseDto.setVerified(false);
+        userResponseDto.setVerified(appUser.isVerified());
         return userResponseDto;
     }
 }

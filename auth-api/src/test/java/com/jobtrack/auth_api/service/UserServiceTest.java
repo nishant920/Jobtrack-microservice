@@ -17,7 +17,4 @@ public class UserServiceTest {
 
     @InjectMocks
     UserService userService;
-
-
-
 }
