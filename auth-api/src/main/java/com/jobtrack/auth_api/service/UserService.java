@@ -1,5 +1,6 @@
 package com.jobtrack.auth_api.service;
 
+import com.jobtrack.auth_api.connector.NotificationApiConnector;
 import com.jobtrack.auth_api.dto.AppUserDto;
 import com.jobtrack.auth_api.dto.UserResponseDto;
 import com.jobtrack.auth_api.exception.InvalidCredentials;
@@ -31,6 +32,9 @@ public class UserService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Autowired
+    NotificationApiConnector notificationApiConnector;
+
     public UserResponseDto saveUser(AppUserDto appUserDto){
         AppUser existingUser = userRepository.findByEmail(appUserDto.getEmail());
         if(existingUser!=null){
@@ -52,6 +56,8 @@ public class UserService {
         verificationToken.setExpiryDate(LocalDateTime.now().plusMinutes(30));//from this moment it got created to 30 mins from now(after 30 mins gets deleted from database)
         verificationToken.setUser(savedUser);
         verificationRepository.save(verificationToken);
+        //calling notification api yo send token to user email
+        notificationApiConnector.sendVerification(savedUser.getEmail(), token);
 
         log.info("calling notification-api to send verification mail with token : " + token);
         return userResponseDto;
