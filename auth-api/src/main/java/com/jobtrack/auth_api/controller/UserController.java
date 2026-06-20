@@ -10,20 +10,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/User")
+@RequestMapping("/api/v1/user")
 public class UserController {
 
     @Autowired
     UserService userService;
 
 
-    @PostMapping("save")
+    @PostMapping("/save")
     public ResponseEntity<?> createUser(@RequestBody AppUserDto appUserDto){
         UserResponseDto appUser = userService.saveUser(appUserDto);
         return new ResponseEntity<>(appUser, HttpStatus.CREATED);
     }
 
-    @PutMapping("verify")
+    @PutMapping("/verify")
     public ResponseEntity<?> verifyEmail(@RequestParam String token){
         try {
             String verify = userService.verifyToken(token);

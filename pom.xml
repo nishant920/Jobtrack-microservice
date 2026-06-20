@@ -13,10 +13,11 @@
         <module>service-registry</module>
         <module>auth-api</module>
         <module>notification-api</module>
+        <module>job-api</module>
     </modules>
 
     <properties>
-        <java.version>21</java.version>
+        <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
