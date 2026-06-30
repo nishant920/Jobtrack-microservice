@@ -2,6 +2,8 @@ package com.jobtrack.job_api.utility;
 
 import com.jobtrack.job_api.Dtos.JobDto;
 import com.jobtrack.job_api.Dtos.JobResponseDto;
+import com.jobtrack.job_api.Dtos.JobSatusResponseDto;
+import com.jobtrack.job_api.Dtos.JobStatusDto;
 import com.jobtrack.job_api.models.Job;
 import org.springframework.stereotype.Component;
 
@@ -30,5 +32,13 @@ public class Mapper {
         jobResponseDto.setJobTitle(job.getJobTitle());
         jobResponseDto.setCompany(jobResponseDto.getCompany());
         return jobResponseDto;
+    }
+
+    public JobSatusResponseDto mapJobToJobStatusResponseDto(Job job){
+        JobSatusResponseDto jobSatusResponseDto = new JobSatusResponseDto();
+
+        jobSatusResponseDto.setJobProfile(job.getJobTitle());
+        jobSatusResponseDto.setJobStatus(job.getStatus());
+        return jobSatusResponseDto;
     }
 }

@@ -2,13 +2,12 @@ package com.jobtrack.job_api.conroller;
 
 import com.jobtrack.job_api.Dtos.JobDto;
 import com.jobtrack.job_api.Dtos.JobResponseDto;
+import com.jobtrack.job_api.Dtos.JobSatusResponseDto;
+import com.jobtrack.job_api.Dtos.JobStatusDto;
 import com.jobtrack.job_api.service.JobService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/job")
@@ -29,4 +28,10 @@ public class JobController {
             }
 
         }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateJobStatus(@PathVariable Long id,  @RequestBody JobStatusDto jobStatusDto){
+        JobSatusResponseDto updatedJob = jobService.updateStatusS(id, jobStatusDto);
+        return new ResponseEntity<>(updatedJob, HttpStatus.OK);
+    }
 }
